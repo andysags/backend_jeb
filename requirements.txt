@@ -42,7 +42,7 @@ cleo==2.1.0
 click==8.1.7
 cloudpickle==3.1.1
 cmake==4.0.3
-cockpit @ file:///builddir/build/BUILD/cockpit-345-build/cockpit-345/tmp/wheel/cockpit-345-py3-none-any.whl#sha256=db6a0d77ed4bba2dc41c8c18d7e4c351c527ff875ebb3bbe4348e70a5c755bbd
+# cockpit @ file:///builddir/build/BUILD/cockpit-345-build/cockpit-345/tmp/wheel/cockpit-345-py3-none-any.whl#sha256=db6a0d77ed4bba2dc41c8c18d7e4c351c527ff875ebb3bbe4348e70a5c755bbd
 conda==24.11.3
 conda-libmamba-solver==24.9.0
 conda-package-handling==2.4.0
