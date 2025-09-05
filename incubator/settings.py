@@ -75,6 +75,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'incubator.urls'
 
+ALLOWED_HOSTS = ["*"]
+
+DATABASES = {
+    "default": dj_database_url.config(default=os.environ.get("DATABASE_URL"))
+}
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -144,6 +150,9 @@ DATABASES = {
         ssl_require=True
     )
 }
+
+SECRET_KEY = os.environ.get("SECRET_KEY", "fallback-secret")
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -175,10 +184,13 @@ USE_I18N = True
 USE_TZ = True
 
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -190,27 +202,3 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # AUTH_USER_MODEL = 'users.Utilisateur'
-
-MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware")
-
-CORS_ALLOWED_ORIGINS = [
-    "https://frontendjeb-production.up.railway.app",
-]
-
-
-# Conditionally enable django-crontab if requested and available
-if ENABLE_CRON:
-    try:
-        import django_crontab  # type: ignore
-
-        # register app if not already present
-        if 'django_crontab' not in INSTALLED_APPS:
-            INSTALLED_APPS.append('django_crontab')
-
-        CRONJOBS = [
-            ('5 */2 * * *', 'django.core.management.call_command', ['sync_all']),
-        ]
-        CRONJOBS_COMMENT = 'Railway Cron Jobs'
-    except Exception:
-        # If django_crontab or system crontab is not available, skip cron setup
-        pass
