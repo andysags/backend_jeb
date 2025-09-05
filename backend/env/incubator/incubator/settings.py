@@ -98,11 +98,15 @@ WSGI_APPLICATION = 'incubator.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'jeb',
-        'USER': 'merchex_user',
-        'PASSWORD': 'merchex_pass',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': 'railway',
+        'USER': 'postgres',
+        'PASSWORD': 'PNFQHBSoaKwLUKPhapgdZKjGnweJcbxa',
+        'HOST': 'metro.proxy.rlwy.net',
+        'PORT': '11321',
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
+
     }
 }
 
