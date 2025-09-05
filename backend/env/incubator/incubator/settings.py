@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from urllib.parse import urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -95,20 +97,28 @@ WSGI_APPLICATION = 'incubator.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',
-        'USER': 'postgres',
-        'PASSWORD': 'PNFQHBSoaKwLUKPhapgdZKjGnweJcbxa',
-        'HOST': 'metro.proxy.rlwy.net',
-        'PORT': '11321',
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
-
+def parse_database_url(db_url: str):
+    """Parse a postgres URL and return a DATABASES-compatible dict."""
+    # expected format: postgres://USER:PASSWORD@HOST:PORT/NAME
+    parsed = urlparse(db_url)
+    return {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': parsed.path.lstrip('/'),
+            'USER': parsed.username,
+            'PASSWORD': parsed.password,
+            'HOST': parsed.hostname,
+            'PORT': str(parsed.port) if parsed.port else '',
+        }
     }
-}
+
+# Use DATABASE_URL from environment if present, otherwise use the Railway URL provided.
+RAILWAY_DATABASE_URL = os.environ.get(
+    'DATABASE_URL',
+    'postgresql://postgres:JiTmqxfjUgAHfOexTCzbKwxvIbEsnzAJ@shuttle.proxy.rlwy.net:19297/railway'
+)
+
+DATABASES = parse_database_url(RAILWAY_DATABASE_URL)
 
 JEB_API_TOKEN = "81d1160831e2f182a69c1526c6b5204e"
 JEB_API_BASE = "https://api.jeb-incubator.com"
