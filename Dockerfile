@@ -5,7 +5,7 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# install system dependencies
+# install system dependencies (including cron for django-crontab)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libssl-dev \
     libffi-dev \
     ca-certificates \
+    cron \
     && rm -rf /var/lib/apt/lists/*
 
 # create virtualenv in image
