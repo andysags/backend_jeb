@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'django_crontab',
     'users',
     'startups',
     'news',
@@ -123,12 +122,28 @@ DATABASES = parse_database_url(RAILWAY_DATABASE_URL)
 JEB_API_TOKEN = "81d1160831e2f182a69c1526c6b5204e"
 JEB_API_BASE = "https://api.jeb-incubator.com"
 
-# Cron: exécution toutes les 2 heures à la minute 5
-CRONJOBS = [
-    ('5 */2 * * *', 'django.core.management.call_command', ['sync_all']),
-]
+# Cron configuration is optional in environments where the `crontab` executable
+# is not available (for example, many container images). Enable cron by setting
+# the environment variable ENABLE_CRON to a truthy value. When enabled, we try
+# to import django_crontab and register the jobs; if the package or system
+# executable isn't present we silently skip cron setup.
+ENABLE_CRON = os.getenv("ENABLE_CRON", "False").lower() in ("1", "true", "yes")
 
 
+# Railway production settings
+import os
+DEBUG = os.getenv("DEBUG", "False") == "True"
+ALLOWED_HOSTS = ["*"]
+
+# Database (via DATABASE_URL)
+import dj_database_url
+DATABASES = {
+    "default": dj_database_url.config(
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True
+    )
+}
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -181,3 +196,21 @@ MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware")
 CORS_ALLOWED_ORIGINS = [
     "https://frontendjeb-production.up.railway.app",
 ]
+
+
+# Conditionally enable django-crontab if requested and available
+if ENABLE_CRON:
+    try:
+        import django_crontab  # type: ignore
+
+        # register app if not already present
+        if 'django_crontab' not in INSTALLED_APPS:
+            INSTALLED_APPS.append('django_crontab')
+
+        CRONJOBS = [
+            ('5 */2 * * *', 'django.core.management.call_command', ['sync_all']),
+        ]
+        CRONJOBS_COMMENT = 'Railway Cron Jobs'
+    except Exception:
+        # If django_crontab or system crontab is not available, skip cron setup
+        pass

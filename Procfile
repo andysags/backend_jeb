@@ -1,2 +1,5 @@
+# API Django (serveur web)
 web: gunicorn incubator.wsgi --log-file -
-worker: python manage.py crontab run
+
+# Worker Cron (sync API JEB par ex.)
+worker: python manage.py crontab add && python manage.py crontab run
