@@ -176,3 +176,8 @@ CORS_ALLOWED_ORIGINS = [
 
 # AUTH_USER_MODEL = 'users.Utilisateur'
 
+MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware")
+
+CORS_ALLOWED_ORIGINS = [
+    "https://frontendjeb-production.up.railway.app",
+]
